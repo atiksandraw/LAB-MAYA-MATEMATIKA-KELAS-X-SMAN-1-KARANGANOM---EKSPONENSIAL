@@ -1,4 +1,60 @@
-https://script.google.com/macros/s/AKfycbyS1m76sZtDDyDyGhCfp8QSVbchD3DcFTIpsnRrlBXxxEQn4t-ObnbLKA228cTEZPuT/exec      body:JSON.stringify(work)
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab Maya | Eksplorasi Fungsi Eksponensial</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+<script>
+const SUBMISSION_URL = "https://script.google.com/macros/s/AKfycbyS1m76sZtDDyDyGhCfp8QSVbchD3DcFTIpsnRrlBXxxEQn4t-ObnbLKA228cTEZPuT/exec";
+
+function collectWork(){
+  const get = id => document.getElementById(id)?.value || "";
+
+  const textareas = Array.from(
+    document.querySelectorAll("textarea")
+  ).map(x => x.value.trim());
+
+  const selected = Array.from(
+    document.querySelectorAll(".options")
+  ).map(g => {
+    const chosen = g.querySelector(".correct");
+    return chosen ? chosen.textContent.trim() : "Belum dijawab";
+  });
+
+  return {
+    nama: get("nama"),
+    absen: get("absen"),
+    kelas: get("kelas"),
+    jawaban: selected,
+    tantangan2: get("challenge2"),
+    refleksi: textareas
+  };
+}
+
+async function submitWork(){
+  const status = document.getElementById("submitStatus");
+  const work = collectWork();
+
+  if(!work.nama || !work.absen || !work.kelas){
+    status.textContent =
+      "⚠️ Lengkapi nama, nomor absen, dan kelas terlebih dahulu.";
+    status.style.color = "var(--bad)";
+    return;
+  }
+
+  status.textContent = "⏳ Sedang mengirim hasil...";
+  status.style.color = "var(--muted)";
+
+  try{
+    const response = await fetch(SUBMISSION_URL,{
+      method:"POST",
+      headers:{
+        "Content-Type":"text/plain;charset=utf-8"
+      },
+      body:JSON.stringify(work)
     });
 
     const result = await response.json();
@@ -40,9 +96,7 @@ https://script.google.com/macros/s/AKfycbyS1m76sZtDDyDyGhCfp8QSVbchD3DcFTIpsnRrl
   --badbg:#fff0f0
 }
 
-*{
-  box-sizing:border-box
-}
+*{box-sizing:border-box}
 
 body{
   margin:0;
@@ -94,9 +148,7 @@ h3{
   margin:0 0 8px
 }
 
-p{
-  margin:7px 0
-}
+p{margin:7px 0}
 
 .card{
   background:var(--card);
@@ -212,9 +264,7 @@ input[type=range]{
   cursor:pointer
 }
 
-.opt:hover{
-  background:#f5f6ff
-}
+.opt:hover{background:#f5f6ff}
 
 .opt.correct{
   border-color:#45a66f;
@@ -287,11 +337,6 @@ button.secondary{
   color:#384056
 }
 
-.score{
-  font-weight:800;
-  margin-top:8px
-}
-
 .note{
   font-size:13px;
   color:var(--muted)
@@ -305,23 +350,15 @@ button.secondary{
 }
 
 @media(max-width:720px){
-  .controls,
-  .goal,
-  .dual{
+  .controls,.goal,.dual{
     grid-template-columns:1fr
   }
 
-  .chartwrap{
-    height:310px
-  }
+  .chartwrap{height:310px}
 
-  .card{
-    padding:17px
-  }
+  .card{padding:17px}
 
-  .hero{
-    padding:23px 20px
-  }
+  .hero{padding:23px 20px}
 }
 
 .identity-card{
@@ -364,19 +401,9 @@ button.secondary{
 }
 
 @media print{
-  body{
-    background:white
-  }
-
-  .container{
-    max-width:none;
-    padding:0
-  }
-
-  .hero{
-    box-shadow:none
-  }
-
+  body{background:white}
+  .container{max-width:none;padding:0}
+  .hero{box-shadow:none}
   .card{
     box-shadow:none;
     break-inside:avoid
@@ -389,6 +416,7 @@ button.secondary{
   }
 }
 </style>
+
 </head>
 
 <body>
@@ -458,23 +486,17 @@ button.secondary{
 
     <div>
       <strong>🔎 Mengamati</strong><br>
-      <span class="note">
-        Perubahan grafik saat parameter diubah.
-      </span>
+      <span class="note">Perubahan grafik saat parameter diubah.</span>
     </div>
 
     <div>
       <strong>🧠 Menalar</strong><br>
-      <span class="note">
-        Menghubungkan bentuk grafik dengan nilai parameter.
-      </span>
+      <span class="note">Menghubungkan bentuk grafik dengan nilai parameter.</span>
     </div>
 
     <div>
       <strong>✍️ Menyimpulkan</strong><br>
-      <span class="note">
-        Merumuskan sifat grafik berdasarkan hasil percobaan.
-      </span>
+      <span class="note">Merumuskan sifat grafik berdasarkan hasil percobaan.</span>
     </div>
 
   </div>
@@ -495,54 +517,36 @@ button.secondary{
     </div>
   </div>
 
-  <div class="formula">
-    f(x) = a<sup>x</sup>
-  </div>
+  <div class="formula">f(x) = a<sup>x</sup></div>
 
   <div class="controls">
 
     <div class="control">
-
       <label>
         Basis a
         <span class="value" id="aVal">2,00</span>
       </label>
 
-      <input
-        id="a"
-        type="range"
-        min="0.1"
-        max="5"
-        step="0.1"
-        value="2"
-      >
+      <input id="a" type="range"
+        min="0.1" max="5" step="0.1" value="2">
 
       <div class="note">
         Geser perlahan dan amati arah grafik.
       </div>
-
     </div>
 
     <div class="control">
-
       <label>
         Rentang x
         <span class="value" id="rangeVal">−5 sampai 5</span>
       </label>
 
-      <input
-        id="range"
-        type="range"
-        min="3"
-        max="8"
-        step="1"
-        value="5"
-      >
+      <input id="range" type="range"
+        min="3" max="8" step="1" value="5">
 
       <div class="note">
         Perbesar rentang jika ingin melihat ekor grafik.
       </div>
-
     </div>
 
   </div>
@@ -552,24 +556,18 @@ button.secondary{
   </div>
 
   <div class="prompt">
-
     <h3>Amati titik istimewa</h3>
-
     <p>
       Perhatikan titik saat <strong>x = 0</strong>.
       Apakah titik tersebut berubah ketika nilai a diubah?
     </p>
-
   </div>
 
   <div class="dual">
 
     <div class="prompt">
 
-      <p>
-        <strong>1.</strong>
-        Jika a &gt; 1, grafik cenderung ...
-      </p>
+      <p><strong>1.</strong> Jika a &gt; 1, grafik cenderung ...</p>
 
       <div class="options" data-answer="naik">
 
@@ -593,10 +591,7 @@ button.secondary{
 
     <div class="prompt">
 
-      <p>
-        <strong>2.</strong>
-        Jika 0 &lt; a &lt; 1, grafik cenderung ...
-      </p>
+      <p><strong>2.</strong> Jika 0 &lt; a &lt; 1, grafik cenderung ...</p>
 
       <div class="options" data-answer="turun">
 
@@ -622,10 +617,7 @@ button.secondary{
 
   <div class="prompt">
 
-    <p>
-      <strong>3.</strong>
-      Ketika a = 1, grafik menjadi ...
-    </p>
+    <p><strong>3.</strong> Ketika a = 1, grafik menjadi ...</p>
 
     <div class="options" data-answer="tetap">
 
@@ -652,23 +644,17 @@ button.secondary{
 <section class="card">
 
   <div class="sectionhead">
-
     <div class="num">3</div>
-
     <div>
       <h2>Eksplorasi B — Mengubah Pangkat</h2>
-
       <p>
         Gunakan slider untuk melihat bagaimana perubahan nilai k
         memengaruhi laju pertumbuhan.
       </p>
     </div>
-
   </div>
 
-  <div class="formula">
-    f(x) = 2<sup>kx</sup>
-  </div>
+  <div class="formula">f(x) = 2<sup>kx</sup></div>
 
   <div class="control">
 
@@ -677,14 +663,8 @@ button.secondary{
       <span class="value" id="kVal">1,00</span>
     </label>
 
-    <input
-      id="k"
-      type="range"
-      min="0.2"
-      max="3"
-      step="0.1"
-      value="1"
-    >
+    <input id="k" type="range"
+      min="0.2" max="3" step="0.1" value="1">
 
   </div>
 
@@ -740,10 +720,7 @@ button.secondary{
 
     <div>
       <h2>Tantangan Investigasi</h2>
-
-      <p>
-        Gunakan slider dan buktikan jawabanmu.
-      </p>
+      <p>Gunakan slider dan buktikan jawabanmu.</p>
     </div>
 
   </div>
@@ -771,11 +748,9 @@ button.secondary{
       grafik <strong>naik</strong>.
     </p>
 
-    <input
-      id="challenge2"
+    <input id="challenge2"
       type="text"
-      placeholder="Contoh format: a = ... dan a = ..."
-    >
+      placeholder="Contoh format: a = ... dan a = ...">
 
   </div>
 
@@ -784,8 +759,7 @@ button.secondary{
     <h3>🎯 Tantangan 3</h3>
 
     <p>
-      Jelaskan mengapa grafik
-      <strong>f(x)=aˣ</strong>
+      Jelaskan mengapa grafik <strong>f(x)=aˣ</strong>
       selalu melalui titik yang sama ketika x = 0.
     </p>
 
@@ -803,11 +777,9 @@ button.secondary{
 
     <div>
       <h2>Refleksi & Kesimpulan</h2>
-
       <p>
         Gunakan hasil percobaanmu untuk menyusun kesimpulan.
       </p>
-
     </div>
 
   </div>
@@ -816,13 +788,11 @@ button.secondary{
 
     <div>
       <strong>Jika a &gt; 1, maka...</strong>
-
       <textarea placeholder="Grafik ..."></textarea>
     </div>
 
     <div>
       <strong>Jika 0 &lt; a &lt; 1, maka...</strong>
-
       <textarea placeholder="Grafik ..."></textarea>
     </div>
 
@@ -834,15 +804,11 @@ button.secondary{
 
     <div>
       <strong>Jika a = 1, maka...</strong>
-
       <textarea placeholder="Grafik ..."></textarea>
     </div>
 
     <div>
-      <strong>
-        Pengaruh k pada 2<sup>kx</sup> adalah...
-      </strong>
-
+      <strong>Pengaruh k pada 2<sup>kx</sup> adalah...</strong>
       <textarea placeholder="Menurut pengamatan saya ..."></textarea>
     </div>
 
@@ -883,9 +849,7 @@ button.secondary{
   <div class="prompt">
 
     <p>
-      <strong>
-        Pastikan identitas dan jawaban sudah lengkap.
-      </strong>
+      <strong>Pastikan identitas dan jawaban sudah lengkap.</strong>
     </p>
 
     <button class="primary" onclick="submitWork()">
@@ -915,50 +879,44 @@ const fmt = v => v.toFixed(2).replace('.',',');
 
 function pointsA(a,r){
 
-  const labels = [];
-  const vals = [];
+  const labels=[];
+  const vals=[];
 
-  for(let x=-r; x<=r; x+=.25){
+  for(let x=-r;x<=r;x+=.25){
 
     labels.push(x.toFixed(2));
 
-    const y = Math.pow(a,x);
+    const y=Math.pow(a,x);
 
     vals.push(
-      Number.isFinite(y) && y < 100000
+      Number.isFinite(y)&&y<100000
         ? y
         : null
     );
   }
 
-  return {
-    labels,
-    vals
-  };
+  return {labels,vals};
 }
 
 function pointsB(k){
 
-  const labels = [];
-  const vals = [];
+  const labels=[];
+  const vals=[];
 
-  for(let x=-5; x<=5; x+=.25){
+  for(let x=-5;x<=5;x+=.25){
 
     labels.push(x.toFixed(2));
 
-    const y = Math.pow(2,k*x);
+    const y=Math.pow(2,k*x);
 
     vals.push(
-      y < 100000
+      y<100000
         ? y
         : null
     );
   }
 
-  return {
-    labels,
-    vals
-  };
+  return {labels,vals};
 }
 
 function opts(title){
@@ -1000,7 +958,6 @@ function opts(title){
           display:true,
           text:'x'
         },
-
         grid:{
           color:'#e8eaf1'
         }
@@ -1011,7 +968,6 @@ function opts(title){
           display:true,
           text:'f(x)'
         },
-
         grid:{
           color:'#e8eaf1'
         }
@@ -1020,14 +976,13 @@ function opts(title){
   };
 }
 
-const c1 = new Chart(
+const c1=new Chart(
   document.getElementById('chartA'),
   {
     type:'line',
 
     data:{
       labels:[],
-
       datasets:[
         {
           data:[],
@@ -1042,14 +997,13 @@ const c1 = new Chart(
   }
 );
 
-const c2 = new Chart(
+const c2=new Chart(
   document.getElementById('chartB'),
   {
     type:'line',
 
     data:{
       labels:[],
-
       datasets:[
         {
           data:[],
@@ -1066,26 +1020,21 @@ const c2 = new Chart(
 
 function updateA(){
 
-  const a =
-    +document.getElementById('a').value;
+  const a=+document.getElementById('a').value;
+  const r=+document.getElementById('range').value;
 
-  const r =
-    +document.getElementById('range').value;
+  document.getElementById('aVal').textContent=fmt(a);
 
-  document.getElementById('aVal').textContent =
-    fmt(a);
-
-  document.getElementById('rangeVal').textContent =
+  document.getElementById('rangeVal').textContent=
     `−${r} sampai ${r}`;
 
-  const d = pointsA(a,r);
+  const d=pointsA(a,r);
 
-  c1.data.labels = d.labels;
+  c1.data.labels=d.labels;
 
-  c1.data.datasets[0].data =
-    d.vals;
+  c1.data.datasets[0].data=d.vals;
 
-  c1.options.plugins.title.text =
+  c1.options.plugins.title.text=
     `Grafik f(x) = ${fmt(a)}ˣ`;
 
   c1.update();
@@ -1093,21 +1042,17 @@ function updateA(){
 
 function updateB(){
 
-  const k =
-    +document.getElementById('k').value;
+  const k=+document.getElementById('k').value;
 
-  document.getElementById('kVal').textContent =
-    fmt(k);
+  document.getElementById('kVal').textContent=fmt(k);
 
-  const d = pointsB(k);
+  const d=pointsB(k);
 
-  c2.data.labels =
-    d.labels;
+  c2.data.labels=d.labels;
 
-  c2.data.datasets[0].data =
-    d.vals;
+  c2.data.datasets[0].data=d.vals;
 
-  c2.options.plugins.title.text =
+  c2.options.plugins.title.text=
     `Grafik f(x) = 2^(${fmt(k)}x)`;
 
   c2.update();
@@ -1125,31 +1070,31 @@ document
   .getElementById('k')
   .addEventListener('input',updateB);
 
-const identityFields = [
+const identityFields=[
   'nama',
   'absen',
   'kelas'
 ];
 
-identityFields.forEach(id => {
+identityFields.forEach(id=>{
 
-  const el =
-    document.getElementById(id);
+  const el=document.getElementById(id);
 
   if(el){
 
-    el.value =
+    el.value=
       localStorage.getItem(
         'labEksponensial_'+id
-      ) || '';
+      )||'';
 
     el.addEventListener(
       'input',
-      () =>
+      ()=>{
         localStorage.setItem(
           'labEksponensial_'+id,
           el.value
-        )
+        );
+      }
     );
   }
 
@@ -1160,67 +1105,56 @@ updateB();
 
 function answer(btn,val){
 
-  const group =
-    btn.parentElement;
-
-  const correct =
-    group.dataset.answer;
-
-  const fb =
-    group.nextElementSibling;
+  const group=btn.parentElement;
+  const correct=group.dataset.answer;
+  const fb=group.nextElementSibling;
 
   group
     .querySelectorAll('.opt')
-    .forEach(x =>
+    .forEach(x=>
       x.classList.remove(
         'correct',
         'wrong'
       )
     );
 
-  if(val === correct){
+  if(val===correct){
 
     btn.classList.add('correct');
 
-    fb.textContent =
+    fb.textContent=
       '✅ Benar! Sekarang jelaskan berdasarkan hasil pengamatanmu.';
 
-    fb.style.color =
-      'var(--ok)';
+    fb.style.color='var(--ok)';
 
   }else{
 
     btn.classList.add('wrong');
 
-    fb.textContent =
+    fb.textContent=
       '💡 Belum tepat. Coba geser slider lagi dan amati perubahan grafik.';
 
-    fb.style.color =
-      'var(--bad)';
+    fb.style.color='var(--bad)';
   }
 }
 
 function resetLab(){
 
-  document.getElementById('a').value = 2;
-
-  document.getElementById('range').value = 5;
-
-  document.getElementById('k').value = 1;
+  document.getElementById('a').value=2;
+  document.getElementById('range').value=5;
+  document.getElementById('k').value=1;
 
   document
     .querySelectorAll(
       'textarea,input[type=text]'
     )
-    .forEach(x =>
-      x.value = ''
-    );
+    .forEach(x=>x.value='');
 
   document
     .querySelectorAll(
       '#nama,#absen,#kelas'
     )
-    .forEach(x =>
+    .forEach(x=>
       localStorage.removeItem(
         'labEksponensial_'+x.id
       )
@@ -1228,7 +1162,7 @@ function resetLab(){
 
   document
     .querySelectorAll('.opt')
-    .forEach(x =>
+    .forEach(x=>
       x.classList.remove(
         'correct',
         'wrong'
@@ -1237,9 +1171,9 @@ function resetLab(){
 
   document
     .querySelectorAll('.feedback')
-    .forEach(x => {
-      x.textContent = '';
-      x.style.color = '';
+    .forEach(x=>{
+      x.textContent='';
+      x.style.color='';
     });
 
   updateA();
