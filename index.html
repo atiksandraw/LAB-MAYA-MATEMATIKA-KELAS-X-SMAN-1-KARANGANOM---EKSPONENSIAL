@@ -4,21 +4,32 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lab Maya | Eksplorasi Fungsi Eksponensial</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+<script>
 const SUBMISSION_URL = "TEMPEL_URL_WEB_APP_GOOGLE_APPS_SCRIPT_DI_SINI";
 
 function collectWork(){
   const get = id => document.getElementById(id)?.value || "";
-  const textareas = Array.from(document.querySelectorAll("textarea")).map(x => x.value.trim());
-  const selected = Array.from(document.querySelectorAll(".options")).map(g => {
-    const chosen = g.querySelector(".correct,.wrong");
+
+  const textareas = Array.from(
+    document.querySelectorAll("textarea")
+  ).map(x => x.value.trim());
+
+  const selected = Array.from(
+    document.querySelectorAll(".options")
+  ).map(g => {
+    const chosen = g.querySelector(".correct");
     return chosen ? chosen.textContent.trim() : "";
   });
+
   return {
     nama: get("nama"),
     absen: get("absen"),
     kelas: get("kelas"),
     jawaban: selected,
+    tantangan2: get("challenge2"),
     refleksi: textareas
   };
 }
@@ -26,89 +37,425 @@ function collectWork(){
 async function submitWork(){
   const status = document.getElementById("submitStatus");
   const work = collectWork();
+
   if(!work.nama || !work.absen || !work.kelas){
-    status.textContent = "⚠️ Lengkapi nama, nomor absen, dan kelas terlebih dahulu.";
+    status.textContent =
+      "⚠️ Lengkapi nama, nomor absen, dan kelas terlebih dahulu.";
     status.style.color = "var(--bad)";
     return;
   }
+
   if(SUBMISSION_URL.includes("TEMPEL_URL")){
-    status.textContent = "ℹ️ Fitur pengiriman belum dihubungkan ke Google Drive guru.";
+    status.textContent =
+      "ℹ️ Fitur pengiriman belum dihubungkan ke Google Drive guru.";
     status.style.color = "var(--bad)";
     return;
   }
+
   status.textContent = "⏳ Sedang mengirim hasil...";
   status.style.color = "var(--muted)";
+
   try{
     const response = await fetch(SUBMISSION_URL,{
       method:"POST",
-      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      headers:{
+        "Content-Type":"text/plain;charset=utf-8"
+      },
       body:JSON.stringify(work)
     });
+
     const result = await response.json();
+
     if(result.ok){
-      status.innerHTML = `✅ Berhasil dikirim. <a href="${result.pdfUrl}" target="_blank">Buka PDF hasil pekerjaan</a>`;
+      status.innerHTML =
+        `✅ Berhasil dikirim.
+        <a href="${result.pdfUrl}" target="_blank">
+        Buka PDF hasil pekerjaan
+        </a>`;
+
       status.style.color = "var(--ok)";
     }else{
       throw new Error(result.error || "Gagal mengirim.");
     }
+
   }catch(err){
-    status.textContent = "❌ Hasil belum terkirim. Periksa koneksi atau pengaturan Google Apps Script.";
+    status.textContent =
+      "❌ Hasil belum terkirim. Periksa koneksi atau pengaturan Google Apps Script.";
+
     status.style.color = "var(--bad)";
     console.error(err);
   }
 }
-
 </script>
-<style>
-:root{--ink:#25304a;--muted:#667085;--soft:#f5f7fc;--card:#fff;--line:#e3e7f0;--accent:#4f46a5;--accent2:#eef0ff;--ok:#247a4b;--okbg:#eaf8ef;--bad:#b33b3b;--badbg:#fff0f0}
-*{box-sizing:border-box}
-body{margin:0;background:var(--soft);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.55}
-.container{max-width:1080px;margin:auto;padding:16px}
-.hero{background:linear-gradient(135deg,#3f4ba8,#7569cf);color:#fff;border-radius:26px;padding:28px 26px;margin:10px 0 18px;box-shadow:0 14px 35px #3f4ba82a}
-.badge{display:inline-block;background:#ffffff22;border:1px solid #ffffff44;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:700;margin-bottom:10px}
-h1{font-size:clamp(26px,5vw,40px);line-height:1.12;margin:0 0 10px}
-h2{font-size:21px;margin:0 0 12px}
-h3{font-size:17px;margin:0 0 8px}
-p{margin:7px 0}
-.card{background:var(--card);border:1px solid #e8ebf3;border-radius:22px;padding:22px;margin:18px 0;box-shadow:0 6px 22px #26324a0d}
-.sectionhead{display:flex;gap:12px;align-items:flex-start;margin-bottom:16px}
-.num{width:34px;height:34px;border-radius:11px;background:var(--accent2);color:var(--accent);display:grid;place-items:center;font-weight:800;flex:0 0 auto}
-.goal{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.goal div{background:#fafbfe;border:1px solid var(--line);border-radius:14px;padding:13px}
-.formula{font-size:27px;text-align:center;font-weight:800;color:#303b96;background:#f3f4ff;border-radius:15px;padding:14px;margin:12px 0 18px}
-.controls{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.control{background:#f8f9fd;border:1px solid #e7e9f1;border-radius:16px;padding:16px}
-.control label{font-weight:750;display:block;margin-bottom:8px}
-input[type=range]{width:100%;accent-color:var(--accent)}
-.value{display:inline-block;background:#e8eafc;color:#303b96;padding:2px 9px;border-radius:9px;margin-left:5px}
-.chartwrap{height:390px;margin-top:14px}
-.prompt{background:#fafbff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:14px}
-.options{display:grid;gap:8px;margin-top:10px}
-.opt{background:white;border:1px solid #d8ddea;border-radius:11px;padding:11px 13px;text-align:left;font:inherit;cursor:pointer}
-.opt:hover{background:#f5f6ff}
-.opt.correct{border-color:#45a66f;background:var(--okbg)}
-.opt.wrong{border-color:#dd6868;background:var(--badbg)}
-.feedback{font-weight:700;min-height:24px;margin-top:8px}
-.dual{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.challenge{background:linear-gradient(135deg,#fffdf5,#f9f7ff);border:1px solid #e9e3c9;border-radius:17px;padding:17px;margin-top:14px}
-input[type=text],textarea{width:100%;border:1px solid #d8ddea;border-radius:12px;padding:11px 12px;font:inherit;background:#fff}
-textarea{min-height:100px;resize:vertical}
-.btnrow{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}
-button.primary,button.secondary{border:0;border-radius:12px;padding:11px 16px;font-weight:750;cursor:pointer}
-.primary{background:var(--accent);color:white}.secondary{background:#eef0f7;color:#384056}
-.score{font-weight:800;margin-top:8px}
-.note{font-size:13px;color:var(--muted)}
-.footer{text-align:center;color:var(--muted);font-size:13px;padding:18px}
-@media(max-width:720px){.controls,.goal,.dual{grid-template-columns:1fr}.chartwrap{height:310px}.card{padding:17px}.hero{padding:23px 20px}}
 
-.identity-card{border-top:4px solid var(--accent)}
-.school-title{display:flex;flex-direction:column;align-items:center;text-align:center;background:#f3f4ff;color:#303b96;border-radius:15px;padding:14px;margin:0 0 16px;font-size:17px}.school-title span{font-size:14px;font-weight:600;color:var(--muted)}
-.identity-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px}.identity-grid .control{background:#fafbfe}
-@media(max-width:720px){.identity-grid{grid-template-columns:1fr}}
-@media print{body{background:white}.container{max-width:none;padding:0}.hero{box-shadow:none}.card{box-shadow:none;break-inside:avoid}.control input[type=range],button,.btnrow{display:none!important}}
+<style>
+:root{
+  --ink:#25304a;
+  --muted:#667085;
+  --soft:#f5f7fc;
+  --card:#fff;
+  --line:#e3e7f0;
+  --accent:#4f46a5;
+  --accent2:#eef0ff;
+  --ok:#247a4b;
+  --okbg:#eaf8ef;
+  --bad:#b33b3b;
+  --badbg:#fff0f0
+}
+
+*{
+  box-sizing:border-box
+}
+
+body{
+  margin:0;
+  background:var(--soft);
+  color:var(--ink);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  line-height:1.55
+}
+
+.container{
+  max-width:1080px;
+  margin:auto;
+  padding:16px
+}
+
+.hero{
+  background:linear-gradient(135deg,#3f4ba8,#7569cf);
+  color:#fff;
+  border-radius:26px;
+  padding:28px 26px;
+  margin:10px 0 18px;
+  box-shadow:0 14px 35px #3f4ba82a
+}
+
+.badge{
+  display:inline-block;
+  background:#ffffff22;
+  border:1px solid #ffffff44;
+  border-radius:999px;
+  padding:5px 10px;
+  font-size:12px;
+  font-weight:700;
+  margin-bottom:10px
+}
+
+h1{
+  font-size:clamp(26px,5vw,40px);
+  line-height:1.12;
+  margin:0 0 10px
+}
+
+h2{
+  font-size:21px;
+  margin:0 0 12px
+}
+
+h3{
+  font-size:17px;
+  margin:0 0 8px
+}
+
+p{
+  margin:7px 0
+}
+
+.card{
+  background:var(--card);
+  border:1px solid #e8ebf3;
+  border-radius:22px;
+  padding:22px;
+  margin:18px 0;
+  box-shadow:0 6px 22px #26324a0d
+}
+
+.sectionhead{
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+  margin-bottom:16px
+}
+
+.num{
+  width:34px;
+  height:34px;
+  border-radius:11px;
+  background:var(--accent2);
+  color:var(--accent);
+  display:grid;
+  place-items:center;
+  font-weight:800;
+  flex:0 0 auto
+}
+
+.goal{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px
+}
+
+.goal div{
+  background:#fafbfe;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:13px
+}
+
+.formula{
+  font-size:27px;
+  text-align:center;
+  font-weight:800;
+  color:#303b96;
+  background:#f3f4ff;
+  border-radius:15px;
+  padding:14px;
+  margin:12px 0 18px
+}
+
+.controls{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px
+}
+
+.control{
+  background:#f8f9fd;
+  border:1px solid #e7e9f1;
+  border-radius:16px;
+  padding:16px
+}
+
+.control label{
+  font-weight:750;
+  display:block;
+  margin-bottom:8px
+}
+
+input[type=range]{
+  width:100%;
+  accent-color:var(--accent)
+}
+
+.value{
+  display:inline-block;
+  background:#e8eafc;
+  color:#303b96;
+  padding:2px 9px;
+  border-radius:9px;
+  margin-left:5px
+}
+
+.chartwrap{
+  height:390px;
+  margin-top:14px
+}
+
+.prompt{
+  background:#fafbff;
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:16px;
+  margin-top:14px
+}
+
+.options{
+  display:grid;
+  gap:8px;
+  margin-top:10px
+}
+
+.opt{
+  background:white;
+  border:1px solid #d8ddea;
+  border-radius:11px;
+  padding:11px 13px;
+  text-align:left;
+  font:inherit;
+  cursor:pointer
+}
+
+.opt:hover{
+  background:#f5f6ff
+}
+
+.opt.correct{
+  border-color:#45a66f;
+  background:var(--okbg)
+}
+
+.opt.wrong{
+  border-color:#dd6868;
+  background:var(--badbg)
+}
+
+.feedback{
+  font-weight:700;
+  min-height:24px;
+  margin-top:8px
+}
+
+.dual{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px
+}
+
+.challenge{
+  background:linear-gradient(135deg,#fffdf5,#f9f7ff);
+  border:1px solid #e9e3c9;
+  border-radius:17px;
+  padding:17px;
+  margin-top:14px
+}
+
+input[type=text],
+textarea{
+  width:100%;
+  border:1px solid #d8ddea;
+  border-radius:12px;
+  padding:11px 12px;
+  font:inherit;
+  background:#fff
+}
+
+textarea{
+  min-height:100px;
+  resize:vertical
+}
+
+.btnrow{
+  display:flex;
+  gap:9px;
+  flex-wrap:wrap;
+  margin-top:10px
+}
+
+button.primary,
+button.secondary{
+  border:0;
+  border-radius:12px;
+  padding:11px 16px;
+  font-weight:750;
+  cursor:pointer
+}
+
+.primary{
+  background:var(--accent);
+  color:white
+}
+
+.secondary{
+  background:#eef0f7;
+  color:#384056
+}
+
+.score{
+  font-weight:800;
+  margin-top:8px
+}
+
+.note{
+  font-size:13px;
+  color:var(--muted)
+}
+
+.footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+  padding:18px
+}
+
+@media(max-width:720px){
+  .controls,
+  .goal,
+  .dual{
+    grid-template-columns:1fr
+  }
+
+  .chartwrap{
+    height:310px
+  }
+
+  .card{
+    padding:17px
+  }
+
+  .hero{
+    padding:23px 20px
+  }
+}
+
+.identity-card{
+  border-top:4px solid var(--accent)
+}
+
+.school-title{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  background:#f3f4ff;
+  color:#303b96;
+  border-radius:15px;
+  padding:14px;
+  margin:0 0 16px;
+  font-size:17px
+}
+
+.school-title span{
+  font-size:14px;
+  font-weight:600;
+  color:var(--muted)
+}
+
+.identity-grid{
+  display:grid;
+  grid-template-columns:2fr 1fr 1fr;
+  gap:12px
+}
+
+.identity-grid .control{
+  background:#fafbfe
+}
+
+@media(max-width:720px){
+  .identity-grid{
+    grid-template-columns:1fr
+  }
+}
+
+@media print{
+  body{
+    background:white
+  }
+
+  .container{
+    max-width:none;
+    padding:0
+  }
+
+  .hero{
+    box-shadow:none
+  }
+
+  .card{
+    box-shadow:none;
+    break-inside:avoid
+  }
+
+  .control input[type=range],
+  button,
+  .btnrow{
+    display:none!important
+  }
+}
 </style>
 </head>
+
 <body>
+
 <div class="container">
 
 <section class="hero">
@@ -118,205 +465,856 @@ button.primary,button.secondary{border:0;border-radius:12px;padding:11px 16px;fo
 </section>
 
 <section class="card identity-card">
-  <div class="sectionhead"><div class="num">👤</div><div><h2>Identitas Peserta</h2><p>Isi identitas sebelum memulai eksplorasi.</p></div></div>
-  <div class="school-title"><strong>Matematika Kelas X</strong><span>SMAN 1 Karanganom</span></div>
+
+  <div class="sectionhead">
+    <div class="num">👤</div>
+    <div>
+      <h2>Identitas Peserta</h2>
+      <p>Isi identitas sebelum memulai eksplorasi.</p>
+    </div>
+  </div>
+
+  <div class="school-title">
+    <strong>Matematika Kelas X</strong>
+    <span>SMAN 1 Karanganom</span>
+  </div>
+
   <div class="identity-grid">
-    <div class="control"><label for="nama">Nama Lengkap</label><input id="nama" type="text" placeholder="Masukkan nama lengkap"></div>
-    <div class="control"><label for="absen">Nomor Absen</label><input id="absen" type="text" inputmode="numeric" placeholder="Nomor absen"></div>
-    <div class="control"><label for="kelas">Kelas</label><input id="kelas" type="text" placeholder="Contoh: X-A"></div>
+
+    <div class="control">
+      <label for="nama">Nama Lengkap</label>
+      <input id="nama" type="text" placeholder="Masukkan nama lengkap">
+    </div>
+
+    <div class="control">
+      <label for="absen">Nomor Absen</label>
+      <input id="absen" type="text" inputmode="numeric" placeholder="Nomor absen">
+    </div>
+
+    <div class="control">
+      <label for="kelas">Kelas</label>
+      <input id="kelas" type="text" placeholder="Contoh: X-A">
+    </div>
+
   </div>
-  <p class="note">Identitas ini akan ikut tampil saat lembar kerja dicetak/disimpan sebagai PDF. Data tidak otomatis terkirim kepada guru.</p>
+
+  <p class="note">
+    Identitas ini akan ikut tampil saat lembar kerja dicetak/disimpan sebagai PDF.
+  </p>
+
 </section>
 
 <section class="card">
-  <div class="sectionhead"><div class="num">1</div><div><h2>Tujuan Eksplorasi</h2><p>Setelah melakukan eksplorasi, kamu diharapkan dapat menemukan hubungan antara nilai basis dan bentuk grafik fungsi eksponensial.</p></div></div>
+
+  <div class="sectionhead">
+    <div class="num">1</div>
+    <div>
+      <h2>Tujuan Eksplorasi</h2>
+      <p>
+        Setelah melakukan eksplorasi, kamu diharapkan dapat menemukan
+        hubungan antara nilai basis dan bentuk grafik fungsi eksponensial.
+      </p>
+    </div>
+  </div>
+
   <div class="goal">
-    <div><strong>🔎 Mengamati</strong><br><span class="note">Perubahan grafik saat parameter diubah.</span></div>
-    <div><strong>🧠 Menalar</strong><br><span class="note">Menghubungkan bentuk grafik dengan nilai parameter.</span></div>
-    <div><strong>✍️ Menyimpulkan</strong><br><span class="note">Merumuskan sifat grafik berdasarkan hasil percobaan.</span></div>
+
+    <div>
+      <strong>🔎 Mengamati</strong><br>
+      <span class="note">
+        Perubahan grafik saat parameter diubah.
+      </span>
+    </div>
+
+    <div>
+      <strong>🧠 Menalar</strong><br>
+      <span class="note">
+        Menghubungkan bentuk grafik dengan nilai parameter.
+      </span>
+    </div>
+
+    <div>
+      <strong>✍️ Menyimpulkan</strong><br>
+      <span class="note">
+        Merumuskan sifat grafik berdasarkan hasil percobaan.
+      </span>
+    </div>
+
   </div>
+
 </section>
 
 <section class="card">
-  <div class="sectionhead"><div class="num">2</div><div><h2>Eksplorasi A — Mengubah Basis</h2><p>Sebelum menggeser slider, buat prediksi: bagaimana bentuk grafik ketika basis berada di antara 0 dan 1? Bagaimana ketika basis lebih dari 1?</p></div></div>
-  <div class="formula">f(x) = a<sup>x</sup></div>
+
+  <div class="sectionhead">
+    <div class="num">2</div>
+    <div>
+      <h2>Eksplorasi A — Mengubah Basis</h2>
+      <p>
+        Sebelum menggeser slider, buat prediksi:
+        bagaimana bentuk grafik ketika basis berada di antara 0 dan 1?
+        Bagaimana ketika basis lebih dari 1?
+      </p>
+    </div>
+  </div>
+
+  <div class="formula">
+    f(x) = a<sup>x</sup>
+  </div>
+
   <div class="controls">
+
     <div class="control">
-      <label>Basis a <span class="value" id="aVal">2,00</span></label>
-      <input id="a" type="range" min="0.1" max="5" step="0.1" value="2">
-      <div class="note">Geser perlahan dan amati arah grafik.</div>
+
+      <label>
+        Basis a
+        <span class="value" id="aVal">2,00</span>
+      </label>
+
+      <input
+        id="a"
+        type="range"
+        min="0.1"
+        max="5"
+        step="0.1"
+        value="2"
+      >
+
+      <div class="note">
+        Geser perlahan dan amati arah grafik.
+      </div>
+
     </div>
+
     <div class="control">
-      <label>Rentang x <span class="value" id="rangeVal">−5 sampai 5</span></label>
-      <input id="range" type="range" min="3" max="8" step="1" value="5">
-      <div class="note">Perbesar rentang jika ingin melihat ekor grafik.</div>
+
+      <label>
+        Rentang x
+        <span class="value" id="rangeVal">−5 sampai 5</span>
+      </label>
+
+      <input
+        id="range"
+        type="range"
+        min="3"
+        max="8"
+        step="1"
+        value="5"
+      >
+
+      <div class="note">
+        Perbesar rentang jika ingin melihat ekor grafik.
+      </div>
+
     </div>
+
   </div>
-  <div class="chartwrap"><canvas id="chartA"></canvas></div>
+
+  <div class="chartwrap">
+    <canvas id="chartA"></canvas>
+  </div>
 
   <div class="prompt">
+
     <h3>Amati titik istimewa</h3>
-    <p>Perhatikan titik saat <strong>x = 0</strong>. Apakah titik tersebut berubah ketika nilai a diubah?</p>
+
+    <p>
+      Perhatikan titik saat <strong>x = 0</strong>.
+      Apakah titik tersebut berubah ketika nilai a diubah?
+    </p>
+
   </div>
 
   <div class="dual">
+
     <div class="prompt">
-      <p><strong>1.</strong> Jika a &gt; 1, grafik cenderung ...</p>
+
+      <p>
+        <strong>1.</strong>
+        Jika a &gt; 1, grafik cenderung ...
+      </p>
+
       <div class="options" data-answer="naik">
-        <button class="opt" onclick="answer(this,'naik')">A. Naik</button>
-        <button class="opt" onclick="answer(this,'turun')">B. Turun</button>
-        <button class="opt" onclick="answer(this,'tetap')">C. Tetap</button>
-      </div><div class="feedback"></div>
+
+        <button class="opt" onclick="answer(this,'naik')">
+          A. Naik
+        </button>
+
+        <button class="opt" onclick="answer(this,'turun')">
+          B. Turun
+        </button>
+
+        <button class="opt" onclick="answer(this,'tetap')">
+          C. Tetap
+        </button>
+
+      </div>
+
+      <div class="feedback"></div>
+
     </div>
+
     <div class="prompt">
-      <p><strong>2.</strong> Jika 0 &lt; a &lt; 1, grafik cenderung ...</p>
+
+      <p>
+        <strong>2.</strong>
+        Jika 0 &lt; a &lt; 1, grafik cenderung ...
+      </p>
+
       <div class="options" data-answer="turun">
-        <button class="opt" onclick="answer(this,'naik')">A. Naik</button>
-        <button class="opt" onclick="answer(this,'turun')">B. Turun</button>
-        <button class="opt" onclick="answer(this,'tetap')">C. Tetap</button>
-      </div><div class="feedback"></div>
+
+        <button class="opt" onclick="answer(this,'naik')">
+          A. Naik
+        </button>
+
+        <button class="opt" onclick="answer(this,'turun')">
+          B. Turun
+        </button>
+
+        <button class="opt" onclick="answer(this,'tetap')">
+          C. Tetap
+        </button>
+
+      </div>
+
+      <div class="feedback"></div>
+
     </div>
+
   </div>
 
   <div class="prompt">
-    <p><strong>3.</strong> Ketika a = 1, grafik menjadi ...</p>
+
+    <p>
+      <strong>3.</strong>
+      Ketika a = 1, grafik menjadi ...
+    </p>
+
     <div class="options" data-answer="tetap">
-      <button class="opt" onclick="answer(this,'naik')">A. Garis yang naik</button>
-      <button class="opt" onclick="answer(this,'turun')">B. Garis yang turun</button>
-      <button class="opt" onclick="answer(this,'tetap')">C. Garis horizontal y = 1</button>
-    </div><div class="feedback"></div>
+
+      <button class="opt" onclick="answer(this,'naik')">
+        A. Garis yang naik
+      </button>
+
+      <button class="opt" onclick="answer(this,'turun')">
+        B. Garis yang turun
+      </button>
+
+      <button class="opt" onclick="answer(this,'tetap')">
+        C. Garis horizontal y = 1
+      </button>
+
+    </div>
+
+    <div class="feedback"></div>
+
   </div>
+
 </section>
 
 <section class="card">
-  <div class="sectionhead"><div class="num">3</div><div><h2>Eksplorasi B — Mengubah Pangkat</h2><p>Gunakan slider untuk melihat bagaimana perubahan nilai k memengaruhi laju pertumbuhan.</p></div></div>
-  <div class="formula">f(x) = 2<sup>kx</sup></div>
+
+  <div class="sectionhead">
+
+    <div class="num">3</div>
+
+    <div>
+      <h2>Eksplorasi B — Mengubah Pangkat</h2>
+
+      <p>
+        Gunakan slider untuk melihat bagaimana perubahan nilai k
+        memengaruhi laju pertumbuhan.
+      </p>
+    </div>
+
+  </div>
+
+  <div class="formula">
+    f(x) = 2<sup>kx</sup>
+  </div>
+
   <div class="control">
-    <label>Nilai k <span class="value" id="kVal">1,00</span></label>
-    <input id="k" type="range" min="0.2" max="3" step="0.1" value="1">
+
+    <label>
+      Nilai k
+      <span class="value" id="kVal">1,00</span>
+    </label>
+
+    <input
+      id="k"
+      type="range"
+      min="0.2"
+      max="3"
+      step="0.1"
+      value="1"
+    >
+
   </div>
-  <div class="chartwrap"><canvas id="chartB"></canvas></div>
+
+  <div class="chartwrap">
+    <canvas id="chartB"></canvas>
+  </div>
+
   <div class="challenge">
+
     <h3>🎯 Tantangan Prediksi</h3>
-    <p>Menurutmu, grafik mana yang tumbuh paling cepat ketika x bertambah?</p>
+
+    <p>
+      Menurutmu, grafik mana yang tumbuh paling cepat ketika x bertambah?
+    </p>
+
     <div class="options" data-answer="3">
-      <button class="opt" onclick="answer(this,'1')">A. 2<sup>x</sup></button>
-      <button class="opt" onclick="answer(this,'2')">B. 2<sup>2x</sup></button>
-      <button class="opt" onclick="answer(this,'3')">C. 2<sup>3x</sup></button>
-    </div><div class="feedback"></div>
+
+      <button class="opt" onclick="answer(this,'1')">
+        A. 2<sup>x</sup>
+      </button>
+
+      <button class="opt" onclick="answer(this,'2')">
+        B. 2<sup>2x</sup>
+      </button>
+
+      <button class="opt" onclick="answer(this,'3')">
+        C. 2<sup>3x</sup>
+      </button>
+
+    </div>
+
+    <div class="feedback"></div>
+
   </div>
+
   <div class="prompt">
-    <p><strong>Coba:</strong> Atur k = 0,5; 1; 2; dan 3. Apa yang terjadi pada laju pertumbuhan grafik?</p>
+
+    <p>
+      <strong>Coba:</strong>
+      Atur k = 0,5; 1; 2; dan 3.
+      Apa yang terjadi pada laju pertumbuhan grafik?
+    </p>
+
   </div>
+
 </section>
 
 <section class="card">
-  <div class="sectionhead"><div class="num">4</div><div><h2>Tantangan Investigasi</h2><p>Gunakan slider dan buktikan jawabanmu.</p></div></div>
+
+  <div class="sectionhead">
+
+    <div class="num">4</div>
+
+    <div>
+      <h2>Tantangan Investigasi</h2>
+
+      <p>
+        Gunakan slider dan buktikan jawabanmu.
+      </p>
+    </div>
+
+  </div>
+
   <div class="challenge">
+
     <h3>🎯 Tantangan 1</h3>
-    <p>Atur basis sehingga grafik <strong>menurun</strong>.</p>
-    <p class="note">Petunjuk: coba nilai basis di antara 0 dan 1.</p>
+
+    <p>
+      Atur basis sehingga grafik <strong>menurun</strong>.
+    </p>
+
+    <p class="note">
+      Petunjuk: coba nilai basis di antara 0 dan 1.
+    </p>
+
   </div>
+
   <div class="challenge">
+
     <h3>🎯 Tantangan 2</h3>
-    <p>Temukan minimal dua nilai basis berbeda yang menghasilkan grafik <strong>naik</strong>.</p>
-    <input id="challenge2" type="text" placeholder="Contoh format: a = ... dan a = ...">
+
+    <p>
+      Temukan minimal dua nilai basis berbeda yang menghasilkan
+      grafik <strong>naik</strong>.
+    </p>
+
+    <input
+      id="challenge2"
+      type="text"
+      placeholder="Contoh format: a = ... dan a = ..."
+    >
+
   </div>
+
   <div class="challenge">
+
     <h3>🎯 Tantangan 3</h3>
-    <p>Jelaskan mengapa grafik <strong>f(x)=aˣ</strong> selalu melalui titik yang sama ketika x = 0.</p>
+
+    <p>
+      Jelaskan mengapa grafik
+      <strong>f(x)=aˣ</strong>
+      selalu melalui titik yang sama ketika x = 0.
+    </p>
+
     <textarea placeholder="Tulis alasanmu di sini..."></textarea>
+
   </div>
+
 </section>
 
 <section class="card">
-  <div class="sectionhead"><div class="num">5</div><div><h2>Refleksi & Kesimpulan</h2><p>Gunakan hasil percobaanmu untuk menyusun kesimpulan.</p></div></div>
-  <div class="dual">
-    <div><strong>Jika a &gt; 1, maka...</strong><textarea placeholder="Grafik ..."></textarea></div>
-    <div><strong>Jika 0 &lt; a &lt; 1, maka...</strong><textarea placeholder="Grafik ..."></textarea></div>
-  </div>
-  <br>
-  <div class="dual">
-    <div><strong>Jika a = 1, maka...</strong><textarea placeholder="Grafik ..."></textarea></div>
-    <div><strong>Pengaruh k pada 2<sup>kx</sup> adalah...</strong><textarea placeholder="Menurut pengamatan saya ..."></textarea></div>
-  </div>
-  <div class="btnrow">
-    <button class="primary" onclick="window.print()">🖨️ Cetak / Simpan PDF</button>
-    <button class="secondary" onclick="resetLab()">↺ Reset Lab</button>
-  </div>
-</section>
 
+  <div class="sectionhead">
+
+    <div class="num">5</div>
+
+    <div>
+      <h2>Refleksi & Kesimpulan</h2>
+
+      <p>
+        Gunakan hasil percobaanmu untuk menyusun kesimpulan.
+      </p>
+
+    </div>
+
+  </div>
+
+  <div class="dual">
+
+    <div>
+      <strong>Jika a &gt; 1, maka...</strong>
+
+      <textarea placeholder="Grafik ..."></textarea>
+    </div>
+
+    <div>
+      <strong>Jika 0 &lt; a &lt; 1, maka...</strong>
+
+      <textarea placeholder="Grafik ..."></textarea>
+    </div>
+
+  </div>
+
+  <br>
+
+  <div class="dual">
+
+    <div>
+      <strong>Jika a = 1, maka...</strong>
+
+      <textarea placeholder="Grafik ..."></textarea>
+    </div>
+
+    <div>
+      <strong>
+        Pengaruh k pada 2<sup>kx</sup> adalah...
+      </strong>
+
+      <textarea placeholder="Menurut pengamatan saya ..."></textarea>
+    </div>
+
+  </div>
+
+  <div class="btnrow">
+
+    <button class="primary" onclick="window.print()">
+      🖨️ Cetak / Simpan PDF
+    </button>
+
+    <button class="secondary" onclick="resetLab()">
+      ↺ Reset Lab
+    </button>
+
+  </div>
+
+</section>
 
 <section class="card" id="submitCard">
+
   <div class="sectionhead">
+
     <div class="num">📤</div>
+
     <div>
       <h2>Kirim Hasil Eksplorasi</h2>
-      <p>Jika semua jawaban sudah selesai, kirim hasil pekerjaanmu kepada guru.</p>
+
+      <p>
+        Jika semua jawaban sudah selesai,
+        kirim hasil pekerjaanmu kepada guru.
+      </p>
+
     </div>
+
   </div>
+
   <div class="prompt">
-    <p><strong>Pastikan identitas dan jawaban sudah lengkap.</strong></p>
-    <button class="primary" onclick="submitWork()">📤 Kirim Hasil ke Guru</button>
+
+    <p>
+      <strong>
+        Pastikan identitas dan jawaban sudah lengkap.
+      </strong>
+    </p>
+
+    <button class="primary" onclick="submitWork()">
+      📤 Kirim Hasil ke Guru
+    </button>
+
     <div id="submitStatus" class="feedback"></div>
-    <p class="note">Setelah berhasil dikirim, guru dapat membuka hasil pekerjaanmu secara online dalam bentuk PDF.</p>
+
+    <p class="note">
+      Setelah berhasil dikirim, guru dapat membuka hasil pekerjaanmu
+      secara online dalam bentuk PDF.
+    </p>
+
   </div>
+
 </section>
 
-<div class="footer">Lab Maya Fungsi Eksponensial • Prototype pembelajaran interaktif</div>
+<div class="footer">
+  Lab Maya Fungsi Eksponensial • Prototype pembelajaran interaktif
+</div>
+
 </div>
 
 <script>
-const fmt=v=>v.toFixed(2).replace('.',',');
+
+const fmt = v => v.toFixed(2).replace('.',',');
+
 function pointsA(a,r){
-  const labels=[],vals=[];
-  for(let x=-r;x<=r;x+=.25){labels.push(x.toFixed(2));const y=Math.pow(a,x);vals.push(Number.isFinite(y)&&y<100000?y:null)}
-  return {labels,vals};
+
+  const labels = [];
+  const vals = [];
+
+  for(let x=-r; x<=r; x+=.25){
+
+    labels.push(x.toFixed(2));
+
+    const y = Math.pow(a,x);
+
+    vals.push(
+      Number.isFinite(y) && y < 100000
+        ? y
+        : null
+    );
+  }
+
+  return {
+    labels,
+    vals
+  };
 }
+
 function pointsB(k){
-  const labels=[],vals=[];
-  for(let x=-5;x<=5;x+=.25){labels.push(x.toFixed(2));const y=Math.pow(2,k*x);vals.push(y<100000?y:null)}
-  return {labels,vals};
+
+  const labels = [];
+  const vals = [];
+
+  for(let x=-5; x<=5; x+=.25){
+
+    labels.push(x.toFixed(2));
+
+    const y = Math.pow(2,k*x);
+
+    vals.push(
+      y < 100000
+        ? y
+        : null
+    );
+  }
+
+  return {
+    labels,
+    vals
+  };
 }
+
 function opts(title){
- return {responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
- plugins:{legend:{display:false},title:{display:true,text:title,font:{size:16,weight:'700'}},tooltip:{callbacks:{label:c=>` f(x) = ${Number(c.raw).toFixed(3)}`}}},
- scales:{x:{title:{display:true,text:'x'},grid:{color:'#e8eaf1'}},y:{title:{display:true,text:'f(x)'},grid:{color:'#e8eaf1'}}}}
+
+  return {
+    responsive:true,
+    maintainAspectRatio:false,
+
+    interaction:{
+      mode:'index',
+      intersect:false
+    },
+
+    plugins:{
+      legend:{
+        display:false
+      },
+
+      title:{
+        display:true,
+        text:title,
+        font:{
+          size:16,
+          weight:'700'
+        }
+      },
+
+      tooltip:{
+        callbacks:{
+          label:c =>
+            ` f(x) = ${Number(c.raw).toFixed(3)}`
+        }
+      }
+    },
+
+    scales:{
+      x:{
+        title:{
+          display:true,
+          text:'x'
+        },
+
+        grid:{
+          color:'#e8eaf1'
+        }
+      },
+
+      y:{
+        title:{
+          display:true,
+          text:'f(x)'
+        },
+
+        grid:{
+          color:'#e8eaf1'
+        }
+      }
+    }
+  };
 }
-const c1=new Chart(document.getElementById('chartA'),{type:'line',data:{labels:[],datasets:[{data:[],borderWidth:3,pointRadius:0,tension:.12}]},options:opts('Grafik f(x) = aˣ')});
-const c2=new Chart(document.getElementById('chartB'),{type:'line',data:{labels:[],datasets:[{data:[],borderWidth:3,pointRadius:0,tension:.12}]},options:opts('Grafik f(x) = 2ᵏˣ')});
+
+const c1 = new Chart(
+  document.getElementById('chartA'),
+  {
+    type:'line',
+
+    data:{
+      labels:[],
+
+      datasets:[
+        {
+          data:[],
+          borderWidth:3,
+          pointRadius:0,
+          tension:.12
+        }
+      ]
+    },
+
+    options:opts('Grafik f(x) = aˣ')
+  }
+);
+
+const c2 = new Chart(
+  document.getElementById('chartB'),
+  {
+    type:'line',
+
+    data:{
+      labels:[],
+
+      datasets:[
+        {
+          data:[],
+          borderWidth:3,
+          pointRadius:0,
+          tension:.12
+        }
+      ]
+    },
+
+    options:opts('Grafik f(x) = 2ᵏˣ')
+  }
+);
+
 function updateA(){
- const a=+document.getElementById('a').value,r=+document.getElementById('range').value;
- document.getElementById('aVal').textContent=fmt(a);document.getElementById('rangeVal').textContent=`−${r} sampai ${r}`;
- const d=pointsA(a,r);c1.data.labels=d.labels;c1.data.datasets[0].data=d.vals;c1.options.plugins.title.text=`Grafik f(x) = ${fmt(a)}ˣ`;c1.update();
+
+  const a =
+    +document.getElementById('a').value;
+
+  const r =
+    +document.getElementById('range').value;
+
+  document.getElementById('aVal').textContent =
+    fmt(a);
+
+  document.getElementById('rangeVal').textContent =
+    `−${r} sampai ${r}`;
+
+  const d = pointsA(a,r);
+
+  c1.data.labels = d.labels;
+
+  c1.data.datasets[0].data =
+    d.vals;
+
+  c1.options.plugins.title.text =
+    `Grafik f(x) = ${fmt(a)}ˣ`;
+
+  c1.update();
 }
+
 function updateB(){
- const k=+document.getElementById('k').value;document.getElementById('kVal').textContent=fmt(k);
- const d=pointsB(k);c2.data.labels=d.labels;c2.data.datasets[0].data=d.vals;c2.options.plugins.title.text=`Grafik f(x) = 2^(${fmt(k)}x)`;c2.update();
+
+  const k =
+    +document.getElementById('k').value;
+
+  document.getElementById('kVal').textContent =
+    fmt(k);
+
+  const d = pointsB(k);
+
+  c2.data.labels =
+    d.labels;
+
+  c2.data.datasets[0].data =
+    d.vals;
+
+  c2.options.plugins.title.text =
+    `Grafik f(x) = 2^(${fmt(k)}x)`;
+
+  c2.update();
 }
-document.getElementById('a').addEventListener('input',updateA);
-document.getElementById('range').addEventListener('input',updateA);
-document.getElementById('k').addEventListener('input',updateB);
 
-const identityFields=['nama','absen','kelas'];
-identityFields.forEach(id=>{const el=document.getElementById(id);if(el){el.value=localStorage.getItem('labEksponensial_'+id)||'';el.addEventListener('input',()=>localStorage.setItem('labEksponensial_'+id,el.value));}});
+document
+  .getElementById('a')
+  .addEventListener('input',updateA);
 
-updateA();updateB();
+document
+  .getElementById('range')
+  .addEventListener('input',updateA);
+
+document
+  .getElementById('k')
+  .addEventListener('input',updateB);
+
+const identityFields = [
+  'nama',
+  'absen',
+  'kelas'
+];
+
+identityFields.forEach(id => {
+
+  const el =
+    document.getElementById(id);
+
+  if(el){
+
+    el.value =
+      localStorage.getItem(
+        'labEksponensial_'+id
+      ) || '';
+
+    el.addEventListener(
+      'input',
+      () =>
+        localStorage.setItem(
+          'labEksponensial_'+id,
+          el.value
+        )
+    );
+  }
+
+});
+
+updateA();
+updateB();
 
 function answer(btn,val){
- const group=btn.parentElement, correct=group.dataset.answer, fb=group.nextElementSibling;
- group.querySelectorAll('.opt').forEach(x=>x.classList.remove('correct','wrong'));
- if(val===correct){btn.classList.add('correct');fb.textContent='✅ Benar! Sekarang jelaskan berdasarkan hasil pengamatanmu.';fb.style.color='var(--ok)'}
- else{btn.classList.add('wrong');fb.textContent='💡 Belum tepat. Coba geser slider lagi dan amati perubahan grafik.';fb.style.color='var(--bad)'}
+
+  const group =
+    btn.parentElement;
+
+  const correct =
+    group.dataset.answer;
+
+  const fb =
+    group.nextElementSibling;
+
+  group
+    .querySelectorAll('.opt')
+    .forEach(x =>
+      x.classList.remove(
+        'correct',
+        'wrong'
+      )
+    );
+
+  if(val === correct){
+
+    btn.classList.add('correct');
+
+    fb.textContent =
+      '✅ Benar! Sekarang jelaskan berdasarkan hasil pengamatanmu.';
+
+    fb.style.color =
+      'var(--ok)';
+
+  }else{
+
+    btn.classList.add('wrong');
+
+    fb.textContent =
+      '💡 Belum tepat. Coba geser slider lagi dan amati perubahan grafik.';
+
+    fb.style.color =
+      'var(--bad)';
+  }
 }
+
 function resetLab(){
- document.getElementById('a').value=2;document.getElementById('range').value=5;document.getElementById('k').value=1;
- document.querySelectorAll('textarea,input[type=text]').forEach(x=>x.value='');
- document.querySelectorAll('#nama,#absen,#kelas').forEach(x=>localStorage.removeItem('labEksponensial_'+x.id));
- document.querySelectorAll('.opt').forEach(x=>x.classList.remove('correct','wrong'));
- document.querySelectorAll('.feedback').forEach(x=>{x.textContent='';x.style.color=''});
- updateA();updateB();window.scrollTo({top:0,behavior:'smooth'});
+
+  document.getElementById('a').value = 2;
+
+  document.getElementById('range').value = 5;
+
+  document.getElementById('k').value = 1;
+
+  document
+    .querySelectorAll(
+      'textarea,input[type=text]'
+    )
+    .forEach(x =>
+      x.value = ''
+    );
+
+  document
+    .querySelectorAll(
+      '#nama,#absen,#kelas'
+    )
+    .forEach(x =>
+      localStorage.removeItem(
+        'labEksponensial_'+x.id
+      )
+    );
+
+  document
+    .querySelectorAll('.opt')
+    .forEach(x =>
+      x.classList.remove(
+        'correct',
+        'wrong'
+      )
+    );
+
+  document
+    .querySelectorAll('.feedback')
+    .forEach(x => {
+      x.textContent = '';
+      x.style.color = '';
+    });
+
+  updateA();
+  updateB();
+
+  window.scrollTo({
+    top:0,
+    behavior:'smooth'
+  });
 }
+
 </script>
+
 </body>
 </html>
